@@ -1,12 +1,21 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+:root {
+    --neon-bg: #0A001F;
+    --neon-deep: #030010;
+    --neon-magenta: #FF0077;
+    --neon-cyan: #00FFFF;
+    --neon-yellow: #FFFF00;
+    --text-color: #E0F7FA;
+}
+
 body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #0A001F;
+    background-color: var(--neon-bg);
     font-family: 'Press Start 2P', cursive;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .container {
