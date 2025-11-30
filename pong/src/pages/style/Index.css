@@ -16,6 +16,7 @@ body {
     background-color: var(--neon-bg);
     font-family: 'Press Start 2P', cursive;
     color: var(--text-color);
+    overflow-x: hidden;
 }
 
 .container {
@@ -23,5 +24,5 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    min-height: 100vh;
 }

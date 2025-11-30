@@ -37,7 +37,7 @@ export default function GameLobby() {
 
     return (
         <div className="game-lobby-container">
-            <h1 className="title">Lobby do Pong 🎮</h1>
+            <h1 className="title">Lobby do Pong</h1>
 
             {/* Criar sala */}
             <div className="accordion">
