@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --neon-bg: #0A001F;
+    --neon-deep: #030010;
+    --neon-magenta: #FF0077;
+    --neon-cyan: #00FFFF;
+    --neon-yellow: #FFFF00;
+    --text-color: #E0F7FA;
+
+    --bg-dark: #0b0f17;
+    --panel-bg: rgba(20, 20, 30, 0.8);
+    --panel-border: #00eaff55;
+    --panel-shadow: #00eaff55;
+
+    --neon-glow: #00eaff;
+    --neon-glow-soft: #00eaff88;
+
+    --log-border: #444;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-dark);
+    font-family: 'Press Start 2P', sans-serif;
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+.game-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.game-card {
+    display: flex;
+    gap: 30px;
+    background: var(--panel-bg);
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 0 25px var(--panel-shadow);
+    border: 2px solid var(--panel-border);
+    backdrop-filter: blur(6px);
+}
+
+.game-canvas {
+    border-radius: 12px;
+}
+
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 320px;
+}
+
+.neon-border {
+    border: 2px solid var(--neon-glow);
+    box-shadow: 0 0 20px var(--neon-glow-soft);
+    border-radius: 12px;
+}
+
+.scoreboard {
+    padding: 20px;
+    text-align: center;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.local-player {
+    color: var(--neon-yellow);
+}
+
+.status-text {
+    margin-top: 15px;
+    font-size: 0.7rem;
+    color: var(--neon-cyan);
+}
+
+.event-log {
+    padding: 15px;
+    height: 330px;
+    overflow-y: auto;
+}
+
+.event-log h2 {
+    font-size: 0.7rem;
+    color: var(--neon-cyan);
+    margin-top: 0;
+}
+
+.event-log ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.6rem;
+}
+
+.event-log li {
+    border-bottom: 1px dashed var(--log-border);
+    padding: 6px 0;
+}
+
+.neon-button {
+    padding: 15px;
+    width: 100%;
+    background: var(--neon-cyan);
+    border: none;
+    color: var(--neon-bg);
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-radius: 8px;
+
+    box-shadow: 0 0 12px var(--neon-cyan);
+    transition: 0.2s ease;
+}
+
+.neon-button:hover {
+    box-shadow: 0 0 25px var(--neon-cyan);
+    transform: scale(1.03);
+}
+
+.neon-button:active {
+    transform: scale(0.95);
+}

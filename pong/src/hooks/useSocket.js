@@ -5,6 +5,7 @@ const SOCKET_SERVER_URL = 'https://backend-pong.onrender.com';
 
 export const useSocket = () => {
     const socketRef = useRef(null);
+    const [socket, setSocket] = useState(null);
 
     const [gameState, setGameState] = useState(null);
     const [log, setLog] = useState([]);
@@ -19,7 +20,7 @@ export const useSocket = () => {
         setIsConnecting(true);
         setConnectionError(null);
 
-        const socket = io(SOCKET_SERVER_URL, {
+        const newSocket = io(SOCKET_SERVER_URL, {
             transports: ['websocket', 'polling'],
             reconnection: true,
             reconnectionAttempts: 5,
@@ -27,61 +28,62 @@ export const useSocket = () => {
             timeout: 20000
         });
 
-        socketRef.current = socket;
+        socketRef.current = newSocket;
+        setSocket(newSocket);
 
-        socket.on('connect', () => {
-            console.log(`[Socket] Conectado! ID: ${socket.id}`);
+        newSocket.on('connect', () => {
+            console.log(`[Socket] Conectado! ID: ${newSocket.id}`);
             setIsConnecting(false);
             setIsConnected(true);
             setConnectionError(null);
         });
 
-        socket.on('connect_error', (err) => {
+        newSocket.on('connect_error', (err) => {
             console.error(`[Socket] Erro de conexão:`, err);
             setIsConnecting(false);
             setIsConnected(false);
             setConnectionError(`Não foi possível conectar ao servidor. Verifique se o backend está rodando.`);
         });
 
-        socket.on('disconnect', (reason) => {
+        newSocket.on('disconnect', (reason) => {
             console.log(`[Socket] Desconectado. Razão: ${reason}`);
             setIsConnected(false);
             if (reason === 'io server disconnect') {
-                socket.connect();
+                newSocket.connect();
             }
         });
 
-        socket.on('reconnect_attempt', (attemptNumber) => {
+        newSocket.on('reconnect_attempt', (attemptNumber) => {
             console.log(`[Socket] Tentativa de reconexão #${attemptNumber}`);
             setIsConnecting(true);
         });
 
-        socket.on('game_state', (state) => {
+        newSocket.on('game_state', (state) => {
             console.log('[Socket] Estado do jogo recebido');
             setGameState(state);
         });
 
-        socket.on('game_log', (message) => {
+        newSocket.on('game_log', (message) => {
             console.log('[Socket] Log:', message);
             setLog(prevLog => [message, ...prevLog].slice(0, 10));
         });
 
-        socket.on('game_error', (message) => {
+        newSocket.on('game_error', (message) => {
             console.error('[Socket] Erro do jogo:', message);
             setLog(prevLog => [`[ERRO] ${message}`, ...prevLog]);
         });
 
-        socket.on('game_created', (data) => {
+        newSocket.on('game_created', (data) => {
             console.log('[Socket] Jogo criado:', data);
             setLog(prevLog => [`Jogo ${data.gameId} criado!`, ...prevLog]);
         });
 
-        socket.on('game_joined', (data) => {
+        newSocket.on('game_joined', (data) => {
             console.log('[Socket] Entrou no jogo:', data);
             setLog(prevLog => [`Entrou no jogo ${data.gameId}!`, ...prevLog]);
         });
 
-        socket.on('game_over', (data) => {
+        newSocket.on('game_over', (data) => {
             console.log('[Socket] Jogo finalizado:', data);
             setLog(prevLog => [`Jogo finalizado! Vencedor: ${data.winner}`, ...prevLog]);
         });
@@ -92,6 +94,7 @@ export const useSocket = () => {
                 socketRef.current.removeAllListeners();
                 socketRef.current.disconnect();
                 socketRef.current = null;
+                setSocket(null);
             }
         };
     }, []);

@@ -139,3 +139,42 @@ body {
     border: 1px dashed #00ffff50;
     border-radius: 8px;
 }
+
+.status-message {
+    padding: 12px 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    animation: slideIn 0.3s ease;
+}
+
+.status-message.error {
+    background: rgba(255, 50, 50, 0.2);
+    border: 2px solid #ff3232;
+    color: #ff6b6b;
+}
+
+.status-message.success {
+    background: rgba(50, 255, 50, 0.2);
+    border: 2px solid #32ff32;
+    color: #6bff6b;
+}
+
+.status-message.connecting {
+    background: rgba(255, 200, 50, 0.2);
+    border: 2px solid #ffc832;
+    color: #ffd966;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

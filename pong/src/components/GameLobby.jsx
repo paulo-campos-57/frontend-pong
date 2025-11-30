@@ -1,43 +1,124 @@
-import React, { useState } from 'react';
-import { io } from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSocketContext } from '../contexts/SocketContext';
 import './style/GameLobby.css';
 
-export default function GameLobby() {
+export default function GameLobby({ setPlayerRole, setGameId }) {
     const [openSection, setOpenSection] = useState(null);
     const [roomCode, setRoomCode] = useState('');
     const [playerName, setPlayerName] = useState('');
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [maxScore] = useState(5);
 
-    const SOCKET_SERVER_URL = "https://backend-pong.onrender.com";
+    const navigate = useNavigate();
+    const { createGame, joinGame, isConnecting, connectionError, socket } = useSocketContext(); // USE createGame e joinGame!
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleGameCreated = (data) => {
+            console.log('Sala criada:', data);
+            setSuccess(`Sala ${data.gameId} criada! Aguardando jogador...`);
+            setPlayerRole(data.playerRole);
+            setGameId(data.gameId);
+
+            setTimeout(() => {
+                navigate(`/game/${data.gameId}`);
+            }, 1000);
+        };
+
+        const handleGameJoined = (data) => {
+            console.log('Entrou na sala:', data);
+            setSuccess('Entrando no jogo...');
+            setPlayerRole(data.playerRole);
+            setGameId(data.gameId);
+
+            setTimeout(() => {
+                navigate(`/game/${data.gameId}`);
+            }, 500);
+        };
+
+        const handleGameError = (message) => {
+            setError(message);
+            setSuccess('');
+        };
+
+        socket.on('game_created', handleGameCreated);
+        socket.on('game_joined', handleGameJoined);
+        socket.on('game_error', handleGameError);
+
+        return () => {
+            socket.off('game_created', handleGameCreated);
+            socket.off('game_joined', handleGameJoined);
+            socket.off('game_error', handleGameError);
+        };
+    }, [socket, setPlayerRole, setGameId, navigate]);
 
     const toggleSection = (sectionName) => {
         setOpenSection(openSection === sectionName ? null : sectionName);
+        setError('');
+        setSuccess('');
     };
 
     const handleCreateRoom = (e) => {
         e.preventDefault();
-        if (!playerName) return;
+        setError('');
+        setSuccess('');
 
-        const socket = io(SOCKET_SERVER_URL);
-        socket.emit('createRoom', playerName, (newRoomCode) => {
-            console.log(`Sala criada: ${newRoomCode}`);
-            socket.disconnect();
-        });
+        if (!playerName.trim()) {
+            setError('Por favor, insira seu nome.');
+            return;
+        }
+
+        createGame(playerName, maxScore);
     };
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
-        if (!roomCode || !playerName) return;
+        setError('');
+        setSuccess('');
 
-        const socket = io(SOCKET_SERVER_URL);
-        socket.emit('joinRoom', { roomCode, playerName }, (success) => {
-            console.log(success ? "Entrou!" : "Falhou ao entrar.");
-            socket.disconnect();
-        });
+        if (!playerName.trim()) {
+            setError('Por favor, insira seu nome.');
+            return;
+        }
+
+        if (!roomCode.trim()) {
+            setError('Por favor, insira o código da sala.');
+            return;
+        }
+
+        joinGame(playerName, roomCode.toUpperCase());
     };
 
     return (
         <div className="game-lobby-container">
             <h1 className="title">Lobby do Pong</h1>
+
+            {isConnecting && (
+                <div className="status-message connecting">
+                    Conectando ao servidor...
+                </div>
+            )}
+
+            {connectionError && (
+                <div className="status-message error">
+                    ❌ {connectionError}
+                </div>
+            )}
+
+            {error && (
+                <div className="status-message error">
+                    ❌ {error}
+                </div>
+            )}
+
+            {success && (
+                <div className="status-message success">
+                    ✅ {success}
+                </div>
+            )}
 
             {/* Criar sala */}
             <div className="accordion">
@@ -60,10 +141,15 @@ export default function GameLobby() {
                             onChange={(e) => setPlayerName(e.target.value)}
                             className="input-field"
                             required
+                            disabled={isConnecting}
                         />
 
-                        <button type="submit" className="action-button">
-                            Iniciar Novo Jogo
+                        <button
+                            type="submit"
+                            className="action-button"
+                            disabled={isConnecting}
+                        >
+                            {isConnecting ? 'Conectando...' : 'Iniciar Novo Jogo'}
                         </button>
                     </form>
                 </div>
@@ -90,19 +176,25 @@ export default function GameLobby() {
                             onChange={(e) => setPlayerName(e.target.value)}
                             className="input-field"
                             required
+                            disabled={isConnecting}
                         />
 
                         <input
                             type="text"
-                            placeholder="Código da Sala"
+                            placeholder="Código da Sala (ex: G1)"
                             value={roomCode}
-                            onChange={(e) => setRoomCode(e.target.value)}
+                            onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                             className="input-field"
                             required
+                            disabled={isConnecting}
                         />
 
-                        <button type="submit" className="action-button">
-                            Entrar na Sala
+                        <button
+                            type="submit"
+                            className="action-button"
+                            disabled={isConnecting}
+                        >
+                            {isConnecting ? 'Conectando...' : 'Entrar na Sala'}
                         </button>
                     </form>
                 </div>
